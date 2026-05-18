@@ -3,6 +3,7 @@ package com.example.chat.config;
 import com.example.chat.handler.ChatWebSocketHandler;
 import com.example.chat.repository.MessageRepository;
 import com.example.chat.repository.UserRepository;
+import com.example.chat.service.GeminiAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,13 +18,15 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
+    private final GeminiAiService aiService;
     private final AuthHandshakeInterceptor authHandshakeInterceptor;
 
     @Autowired
     public WebSocketConfig(UserRepository userRepository, MessageRepository messageRepository,
-                           AuthHandshakeInterceptor authHandshakeInterceptor) {
+                           GeminiAiService aiService, AuthHandshakeInterceptor authHandshakeInterceptor) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.aiService = aiService;
         this.authHandshakeInterceptor = authHandshakeInterceptor;
     }
 
@@ -36,14 +39,14 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public ChatWebSocketHandler chatWebSocketHandler() {
-        return new ChatWebSocketHandler(userRepository, messageRepository);
+        return new ChatWebSocketHandler(userRepository, messageRepository, aiService);
     }
 
     @Bean
     public ServletServerContainerFactoryBean createWebSocketContainer() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-        container.setMaxTextMessageBufferSize(10 * 1024 * 1024); // 10MB
-        container.setMaxBinaryMessageBufferSize(10 * 1024 * 1024); // 10MB
+        container.setMaxTextMessageBufferSize(10 * 1024 * 1024);
+        container.setMaxBinaryMessageBufferSize(10 * 1024 * 1024);
         return container;
     }
 }

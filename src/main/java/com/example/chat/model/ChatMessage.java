@@ -10,16 +10,16 @@ public class ChatMessage {
     private String roomCode;
     private String content;
     private String timestamp;
-    private Set<String> users; // Active users in a room
-    private List<User> userProfiles; // Online/Offline user database profiles
-    private List<ChatMessage> history; // Historical message list for loading logs
+    private Set<String> users;
+    private List<User> userProfiles;
+    private List<ChatMessage> history;
+    private Boolean encrypted;
+    private String publicKey;
 
-    // Media properties
-    private String mediaData; // Base64 data URL
-    private String mediaName; // Filename
-    private String mediaType; // Mime type
+    private String mediaData;
+    private String mediaName;
+    private String mediaType;
 
-    // Default constructor for Jackson JSON deserialization
     public ChatMessage() {
     }
 
@@ -100,6 +100,22 @@ public class ChatMessage {
 
     public void setHistory(List<ChatMessage> history) {
         this.history = history;
+    }
+
+    public Boolean getEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(Boolean encrypted) {
+        this.encrypted = encrypted;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     public String getMediaData() {

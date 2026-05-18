@@ -45,6 +45,10 @@ const chatTitle = document.getElementById("chat-title");
 const chatSubtitle = document.getElementById("chat-subtitle");
 const chatAvatar = document.getElementById("chat-avatar");
 const leaveChatBtn = document.getElementById("leave-chat-btn");
+const aiSummarizeBtn = document.getElementById("ai-summarize-btn");
+const aiModal = document.getElementById("ai-modal");
+const aiModalBody = document.getElementById("ai-modal-body");
+const closeAiModalBtn = document.getElementById("close-ai-modal-btn");
 const messagesContainer = document.getElementById("messages-container");
 const messageForm = document.getElementById("message-form");
 const messageInput = document.getElementById("message-input");
@@ -87,6 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     messageForm.addEventListener("submit", sendMessage);
     leaveChatBtn.addEventListener("click", leaveCurrentRoom);
+    if (aiSummarizeBtn) aiSummarizeBtn.addEventListener("click", handleAiSummarize);
+    if (closeAiModalBtn) closeAiModalBtn.addEventListener("click", () => aiModal.classList.add("hidden"));
 
     // 5. Trigger Auto-Login if JWT exists in storage
     checkAutoLogin();
@@ -232,9 +238,19 @@ function connectToWebSocket(token, username) {
         };
 
         ws.onclose = () => {
-            console.log("WebSocket Connection Closed");
-            handleLogoutCleanup();
-            goBackToLogin();
+            console.log("WebSocket Connection Closed. Attempting auto-reconnect...");
+            const token = localStorage.getItem("nexus_jwt");
+            const username = localStorage.getItem("nexus_username");
+            if (token && username) {
+                setTimeout(() => {
+                    if (!ws || ws.readyState === WebSocket.CLOSED) {
+                        connectToWebSocket(token, username);
+                    }
+                }, 2000);
+            } else {
+                handleLogoutCleanup();
+                goBackToLogin();
+            }
         };
 
     } catch (e) {
@@ -531,6 +547,7 @@ function selectChat(type, target) {
         chatAvatar.textContent = "#";
         chatAvatar.style.background = "linear-gradient(135deg, hsl(200, 70%, 50%), hsl(220, 70%, 40%))";
         leaveChatBtn.classList.remove("hidden");
+        if (aiSummarizeBtn) aiSummarizeBtn.classList.remove("hidden");
     } else {
         chatTitle.textContent = target;
         
@@ -541,6 +558,7 @@ function selectChat(type, target) {
         chatAvatar.textContent = target.substring(0, 2).toUpperCase();
         chatAvatar.style.background = getGradientForName(target);
         leaveChatBtn.classList.add("hidden");
+        if (aiSummarizeBtn) aiSummarizeBtn.classList.add("hidden");
     }
 
     messagesContainer.innerHTML = `
@@ -651,7 +669,16 @@ function appendMessageToUI(msg) {
             }
         }
         
-        const contentHtml = msg.content ? `<div class="msg-content">${escapeHTML(msg.content)}</div>` : "";
+        let rawContent = msg.content;
+        if (rawContent && typeof CryptoJS !== "undefined" && rawContent.startsWith("ENC:")) {
+            try {
+                let key = activeChat ? activeChat.target : "nexus_key";
+                let bytes = CryptoJS.AES.decrypt(rawContent.substring(4), key);
+                let decrypted = bytes.toString(CryptoJS.enc.Utf8);
+                if (decrypted) rawContent = decrypted;
+            } catch (err) {}
+        }
+        const contentHtml = rawContent ? `<div class="msg-content">${escapeHTML(rawContent)}</div>` : "";
         
         wrapper.innerHTML = `
             ${!isOutgoing ? `<div class="avatar small" style="background: ${getGradientForName(msg.sender)}">${avatarLetter}</div>` : ""}
@@ -671,8 +698,18 @@ function appendMessageToUI(msg) {
 }
 
 function sendMessage(e) {
-    e.preventDefault();
-    if (!ws || ws.readyState !== WebSocket.OPEN || !activeChat) return;
+    if (e) e.preventDefault();
+
+    if (!activeChat) {
+        alert("Please select or join a room/chat first!");
+        return;
+    }
+
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert("Reconnecting to chat server... Please try again in 2 seconds.");
+        checkAutoLogin();
+        return;
+    }
 
     const content = messageInput.value.trim();
     if (!content && !selectedFileData) return;
@@ -690,7 +727,14 @@ function sendMessage(e) {
     }
 
     if (content) {
-        payload.content = content;
+        let finalContent = content;
+        if (typeof CryptoJS !== "undefined" && !content.startsWith("@ai")) {
+            try {
+                let key = activeChat.target;
+                finalContent = "ENC:" + CryptoJS.AES.encrypt(content, key).toString();
+            } catch (err) {}
+        }
+        payload.content = finalContent;
     }
 
     if (selectedFileData) {
@@ -749,4 +793,27 @@ function formatBytes(bytes, decimals = 2) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+// --- AI Room Summarize Handler ---
+function handleAiSummarize() {
+    if (!activeChat || activeChat.type !== "room") return;
+    const roomCode = activeChat.target;
+
+    aiModal.classList.remove("hidden");
+    aiModalBody.innerHTML = `<p><i class="fa-solid fa-spinner fa-spin"></i> Generating intelligent room summary for <strong>#${roomCode}</strong>...</p>`;
+
+    fetch(`/api/ai/summarize-room?roomCode=${encodeURIComponent(roomCode)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.summary) {
+                aiModalBody.innerHTML = data.summary;
+            } else {
+                aiModalBody.innerHTML = `<p style="color: var(--accent-red);">${data.error || "Failed to generate summary."}</p>`;
+            }
+        })
+        .catch(err => {
+            console.error("AI Summary error:", err);
+            aiModalBody.innerHTML = `<p style="color: var(--accent-red);">Failed to connect to AI service.</p>`;
+        });
 }

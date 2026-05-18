@@ -5,6 +5,7 @@ import com.example.chat.model.Message;
 import com.example.chat.model.User;
 import com.example.chat.repository.MessageRepository;
 import com.example.chat.repository.UserRepository;
+import com.example.chat.service.GeminiAiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
@@ -22,31 +24,42 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
+    private final GeminiAiService aiService;
 
-    // Map of WebSocketSession ID to Nickname
     private final Map<String, String> sessionToNickname = new ConcurrentHashMap<>();
-    // Map of Nickname to WebSocketSession
     private final Map<String, WebSocketSession> nicknameToSession = new ConcurrentHashMap<>();
-
-    // Map of Room Code to Set of WebSocket Sessions
     private final Map<String, Set<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
 
-    public ChatWebSocketHandler(UserRepository userRepository, MessageRepository messageRepository) {
+    public ChatWebSocketHandler(UserRepository userRepository, MessageRepository messageRepository, GeminiAiService aiService) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.aiService = aiService;
         resetAllUsersToOffline();
     }
 
     private void resetAllUsersToOffline() {
         try {
+            String[] seedUsers = {
+                "shyam", "shiv", "batman", "srijan", "trishant patel",
+                "uday", "ram", "kshitij", "aarav", "rohit",
+                "priya", "aditya", "ananya", "vikram", "neha",
+                "siddharth", "pooja", "kabir", "rahul", "dev"
+            };
+            org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+            for (String username : seedUsers) {
+                if (userRepository.findById(username).isEmpty()) {
+                    String cleanName = username.replaceAll("\\s+", "").toLowerCase();
+                    User u = new User(username, cleanName + "@chat.com", encoder.encode("password123"), "OFFLINE");
+                    userRepository.save(u);
+                }
+            }
             List<User> users = userRepository.findAll();
             for (User u : users) {
                 u.setStatus("OFFLINE");
             }
             userRepository.saveAll(users);
-            System.out.println("Initialized database: reset " + users.size() + " users to OFFLINE.");
         } catch (Exception e) {
-            System.err.println("Could not reset user statuses on startup: " + e.getMessage());
+            System.err.println("Database init error: " + e.getMessage());
         }
     }
 
@@ -246,6 +259,46 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         forwardMsg.setTimestamp(dbMsg.getTimestamp());
 
         broadcastToRoom(roomCode, forwardMsg);
+
+        // 3. Check for @ai mention in room chat
+        String content = chatMessage.getContent();
+        System.out.println("DEBUG handleSendRoomMsg content: '" + content + "'");
+        if (content != null && content.trim().toLowerCase().startsWith("@ai")) {
+            String prompt = content.trim().substring(3).trim();
+            if (prompt.isEmpty()) {
+                prompt = "How can I assist the group today?";
+            }
+
+            final String targetRoom = roomCode;
+            final String aiPrompt = prompt;
+            System.out.println("DEBUG Triggering AI async call for prompt: '" + aiPrompt + "' in room: " + targetRoom);
+
+            CompletableFuture.runAsync(() -> {
+                try {
+                    String aiResponseText = aiService.askAi(aiPrompt);
+                    System.out.println("DEBUG Received AI response: " + aiResponseText);
+
+                    Message aiDbMsg = new Message(
+                            "🤖 AI Assistant",
+                            null,
+                            targetRoom,
+                            aiResponseText,
+                            null, null, null
+                    );
+                    messageRepository.save(aiDbMsg);
+
+                    ChatMessage aiForwardMsg = new ChatMessage("CHAT_ROOM", "🤖 AI Assistant", aiResponseText);
+                    aiForwardMsg.setRoomCode(targetRoom);
+                    aiForwardMsg.setTimestamp(aiDbMsg.getTimestamp());
+
+                    broadcastToRoom(targetRoom, aiForwardMsg);
+                    System.out.println("DEBUG Broadcasted AI response to room: " + targetRoom);
+                } catch (Exception e) {
+                    System.err.println("Failed to process AI chat response: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void handleSendPrivateMsg(WebSocketSession session, ChatMessage chatMessage) throws IOException {

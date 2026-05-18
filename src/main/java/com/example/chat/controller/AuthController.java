@@ -43,19 +43,16 @@ public class AuthController {
         String email = request.getEmail().trim().toLowerCase();
         String password = request.getPassword();
 
-        // 1. Verify username is unique
         if (userRepository.findById(username).isPresent()) {
             response.put("error", "Username '" + username + "' is already taken");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // 2. Verify email is unique
         if (userRepository.findByEmail(email).isPresent()) {
             response.put("error", "Email is already registered");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // 3. Encrypt password and save user
         try {
             String hashedPassword = passwordEncoder.encode(password);
             User user = new User(username, email, hashedPassword, "OFFLINE");
@@ -82,7 +79,6 @@ public class AuthController {
         String email = request.getEmail().trim().toLowerCase();
         String password = request.getPassword();
 
-        // 1. Find user by email
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             response.put("error", "Invalid email or password");
@@ -91,13 +87,11 @@ public class AuthController {
 
         User user = userOpt.get();
 
-        // 2. Validate password
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             response.put("error", "Invalid email or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
-        // 3. Generate JWT and respond
         try {
             String token = jwtUtil.generateToken(user.getUsername());
             response.put("token", token);
@@ -109,7 +103,6 @@ public class AuthController {
         }
     }
 
-    // Helper classes for parsing request bodies
     public static class RegisterRequest {
         private String username;
         private String email;

@@ -34,15 +34,14 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
             if (token == null || token.trim().isEmpty() || !jwtUtil.validateTokenOnly(token)) {
                 System.out.println("WebSocket Handshake blocked: Missing or invalid JWT token");
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                return false; // Deny handshake
+                return false;
             }
 
             try {
                 String username = jwtUtil.extractUsername(token);
-                // Store the authenticated username in session attributes
                 attributes.put("username", username);
                 System.out.println("WebSocket Handshake approved for user: " + username);
-                return true; // Allow handshake
+                return true;
             } catch (Exception e) {
                 System.out.println("WebSocket Handshake blocked: Failed to extract claims");
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -57,6 +56,5 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                WebSocketHandler wsHandler, Exception exception) {
-        // No post-handshake tasks required
     }
 }

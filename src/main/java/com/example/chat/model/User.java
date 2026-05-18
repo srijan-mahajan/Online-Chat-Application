@@ -14,8 +14,9 @@ public class User {
     private String email;
 
     private String passwordHash;
-    private String status; // "ONLINE" or "OFFLINE"
-    private Long lastSeen; // Epoch millisecond timestamp
+    private String status;
+    private Long lastSeen;
+    private String publicKey;
 
     public User() {
     }
@@ -67,5 +68,13 @@ public class User {
 
     public void setLastSeen(Long lastSeen) {
         this.lastSeen = lastSeen;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 }
