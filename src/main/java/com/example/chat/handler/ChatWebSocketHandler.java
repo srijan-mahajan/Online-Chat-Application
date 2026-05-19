@@ -39,12 +39,20 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private void resetAllUsersToOffline() {
         try {
-            String[] seedUsers = {
+            Set<String> seedUsers = Set.of(
                 "shyam", "shiv", "batman", "srijan", "trishant patel",
                 "uday", "ram", "kshitij", "aarav", "rohit",
                 "priya", "aditya", "ananya", "vikram", "neha",
                 "siddharth", "pooja", "kabir", "rahul", "dev"
-            };
+            );
+            
+            List<User> existingUsers = userRepository.findAll();
+            for (User u : existingUsers) {
+                if (!seedUsers.contains(u.getUsername())) {
+                    userRepository.delete(u);
+                }
+            }
+
             org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
             for (String username : seedUsers) {
                 if (userRepository.findById(username).isEmpty()) {
@@ -332,9 +340,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             System.err.println("Failed to persist direct message to database: " + e.getMessage());
         }
 
-        // 2. If the recipient is ONLINE, forward the message immediately
         WebSocketSession recipientSession = nicknameToSession.get(recipient);
-        if (recipientSession != null && recipientSession.isOpen()) {
+        if (recipientSession != null && recipientSession.isOpen() && !recipientSession.getId().equals(session.getId())) {
             ChatMessage forwardMsg = new ChatMessage("CHAT_PRIVATE", senderNickname, chatMessage.getContent());
             forwardMsg.setRecipient(recipient);
             forwardMsg.setMediaData(chatMessage.getMediaData());
@@ -345,7 +352,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             recipientSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(forwardMsg)));
         }
 
-        // 3. Send confirmation back to the sender
         ChatMessage confirmMsg = new ChatMessage("CHAT_PRIVATE", senderNickname, chatMessage.getContent());
         confirmMsg.setRecipient(recipient);
         confirmMsg.setMediaData(chatMessage.getMediaData());
