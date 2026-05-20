@@ -1688,5 +1688,52 @@ body, html {
     white-space: pre-line;
 }
 
+.back-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 6px;
+    margin-right: 6px;
+    display: none;
+}
+
+@media (max-width: 768px) {
+    body, html {
+        overflow: auto;
+    }
+    
+    #chat-dashboard {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: 100%;
+        border-right: none;
+    }
+    
+    .sidebar.mobile-hidden {
+        display: none !important;
+    }
+    
+    .chat-area {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .back-btn.mobile-only {
+        display: inline-block;
+    }
+    
+    .msg-wrapper {
+        max-width: 85%;
+    }
+}
+
 
 

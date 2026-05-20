@@ -94,7 +94,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (aiSummarizeBtn) aiSummarizeBtn.addEventListener("click", handleAiSummarize);
     if (closeAiModalBtn) closeAiModalBtn.addEventListener("click", () => aiModal.classList.add("hidden"));
 
-    // 5. Trigger Auto-Login if JWT exists in storage
+    const backToSidebarBtn = document.getElementById("back-to-sidebar-btn");
+    if (backToSidebarBtn) {
+        backToSidebarBtn.addEventListener("click", () => {
+            const sidebar = document.querySelector(".sidebar");
+            if (sidebar) sidebar.classList.remove("mobile-hidden");
+            activeChatView.classList.add("hidden");
+            welcomeChatView.classList.remove("hidden");
+        });
+    }
+
     checkAutoLogin();
 });
 
@@ -537,6 +546,9 @@ function selectChat(type, target) {
     
     renderUserList();
     renderRoomsList();
+
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar) sidebar.classList.add("mobile-hidden");
 
     welcomeChatView.classList.add("hidden");
     activeChatView.classList.remove("hidden");
