@@ -102,24 +102,32 @@
             </div>
 
             <div class="sidebar-section">
+                <div class="meta-ai-banner" id="meta-ai-btn" title="Chat with Meta AI">
+                    <div class="avatar small meta-ai-avatar"><i class="fa-solid fa-circle-nodes"></i></div>
+                    <div class="user-info">
+                        <span class="username">Meta AI</span>
+                        <span class="subtitle">Ask questions & AI assistance</span>
+                    </div>
+                    <span class="sidebar-badge ai">AI</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section scrollable-list">
+                <h3><i class="fa-solid fa-users"></i> Chats (<span id="online-count">0</span>)</h3>
+                <ul id="users-list" class="sidebar-list">
+                </ul>
+            </div>
+
+            <div class="sidebar-section border-top">
                 <h3><i class="fa-solid fa-cube"></i> Rooms</h3>
                 <div class="room-action-form">
                     <div class="input-wrapper-small">
                         <input type="text" id="room-code-input" placeholder="Room Code (e.g. TECH)" maxlength="10" autocomplete="off">
                         <button id="generate-code-btn" title="Generate Code"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
                     </div>
-                    <button id="join-room-btn" class="secondary-btn-small">Join / Create</button>
+                    <button id="join-room-btn" class="secondary-btn-small">Join / Create Room</button>
                 </div>
-            </div>
-
-            <div class="sidebar-section scrollable-list">
-                <ul id="rooms-list" class="sidebar-list">
-                </ul>
-            </div>
-
-            <div class="sidebar-section scrollable-list border-top">
-                <h3><i class="fa-solid fa-users"></i> Direct Messages (<span id="online-count">0</span>)</h3>
-                <ul id="users-list" class="sidebar-list">
+                <ul id="rooms-list" class="sidebar-list" style="margin-top: 8px;">
                 </ul>
             </div>
         </aside>

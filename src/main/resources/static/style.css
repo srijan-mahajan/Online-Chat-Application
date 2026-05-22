@@ -290,6 +290,37 @@ body, html {
 
 .logout-btn-icon:hover { color: #ef4444; }
 
+.meta-ai-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #182229;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.meta-ai-banner:hover {
+    background: var(--item-hover);
+    border-color: var(--primary);
+}
+
+.meta-ai-avatar {
+    background: linear-gradient(135deg, #00a884, #3b82f6) !important;
+    color: white;
+}
+
+.sidebar-badge.ai {
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
 .sidebar-section {
     padding: 12px 16px;
 }

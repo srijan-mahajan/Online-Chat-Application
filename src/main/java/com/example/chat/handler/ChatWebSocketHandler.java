@@ -360,6 +360,28 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         confirmMsg.setTimestamp(dbMsg.getTimestamp());
         
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(confirmMsg)));
+
+        if ("Meta AI".equalsIgnoreCase(recipient) || "🤖 Meta AI".equalsIgnoreCase(recipient)) {
+            final String prompt = chatMessage.getContent();
+            final String targetUser = senderNickname;
+            CompletableFuture.runAsync(() -> {
+                try {
+                    String aiReply = aiService.askAi(prompt);
+                    Message aiDbMsg = new Message("Meta AI", targetUser, null, aiReply, null, null, null);
+                    messageRepository.save(aiDbMsg);
+
+                    WebSocketSession senderSession = nicknameToSession.get(targetUser);
+                    if (senderSession != null && senderSession.isOpen()) {
+                        ChatMessage aiMsg = new ChatMessage("CHAT_PRIVATE", "Meta AI", aiReply);
+                        aiMsg.setRecipient(targetUser);
+                        aiMsg.setTimestamp(aiDbMsg.getTimestamp());
+                        senderSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(aiMsg)));
+                    }
+                } catch (Exception e) {
+                    System.err.println("Meta AI error: " + e.getMessage());
+                }
+            });
+        }
     }
 
     private void handleGetHistory(WebSocketSession session, ChatMessage chatMessage) throws IOException {

@@ -104,6 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const metaAiBtn = document.getElementById("meta-ai-btn");
+    if (metaAiBtn) {
+        metaAiBtn.addEventListener("click", () => selectChat("private", "Meta AI"));
+    }
+
     checkAutoLogin();
 });
 
