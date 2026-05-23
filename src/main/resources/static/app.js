@@ -745,7 +745,8 @@ function sendMessage(e) {
 
     if (content) {
         let finalContent = content;
-        if (typeof CryptoJS !== "undefined" && !content.startsWith("@ai")) {
+        const isMetaAi = activeChat.target === "Meta AI" || activeChat.target === "🤖 Meta AI";
+        if (typeof CryptoJS !== "undefined" && !content.startsWith("@ai") && !isMetaAi) {
             try {
                 let key = activeChat.target;
                 finalContent = "ENC:" + CryptoJS.AES.encrypt(content, key).toString();

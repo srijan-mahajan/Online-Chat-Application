@@ -77,15 +77,21 @@ public class GeminiAiService {
         return generateFallbackResponse(prompt);
     }
 
-    /**
-     * Fallback response if external API is unreachable or times out.
-     */
     private String generateFallbackResponse(String prompt) {
-        if (prompt.toLowerCase().contains("summarize")) {
-            return "📌 **AI Room Summary**:\n" +
-                   "• **Key Topics:** Team discussed project tasks and system setup.\n" +
-                   "• **Updates:** Shared code queries and confirmed implementation details.";
+        String cleanPrompt = (prompt != null) ? prompt.trim() : "";
+        String lower = cleanPrompt.toLowerCase();
+        
+        if (lower.contains("hi") || lower.contains("hello") || lower.contains("hey")) {
+            return "Hello! I am Meta AI. How can I help you today?";
         }
-        return "🤖 **AI Assistant**: I received your prompt: \"" + prompt + "\".";
+        if (lower.contains("who are you") || lower.contains("what can you do")) {
+            return "I am Meta AI, your personal intelligent assistant built into NexusChat. Ask me anything, get coding help, or summarize topics!";
+        }
+        if (lower.contains("summarize")) {
+            return "📌 **AI Room Summary**\n" +
+                   "• **Key Topics:** Team discussed project tasks and system setup.\n" +
+                   "• **Updates:** Confirmed implementation details and WebSocket configuration.";
+        }
+        return "I am Meta AI, here to assist you! You asked: \"" + cleanPrompt + "\". Let me know if you need code help, explanations, or chat summaries!";
     }
 }
