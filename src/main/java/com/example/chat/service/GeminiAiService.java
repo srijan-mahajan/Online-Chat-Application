@@ -82,6 +82,35 @@ public class GeminiAiService {
         String cleanPrompt = (prompt != null) ? prompt.trim() : "";
         String lower = cleanPrompt.toLowerCase();
         
+        if (lower.contains("javascript") || lower.contains("js")) {
+            return "⚡ **JavaScript (JS)** is a high-level, multi-paradigm programming language that powers dynamic interactive web applications and Node.js backend servers.\n\n" +
+                   "📌 **Key Concepts:**\n" +
+                   "• **Event-Driven & Asynchronous:** Uses an Event Loop, Promises, and `async/await` for non-blocking I/O.\n" +
+                   "• **Single-Threaded Execution:** Executes code sequentially while delegating async events to background workers.\n" +
+                   "• **Full-Stack Ecosystem:** Powers modern frontend UI frameworks (React, Vue) and backend services (Node.js, Express).\n" +
+                   "• **Dynamic & Weakly Typed:** Variables are declared dynamically with `const`, `let`, and `var`.";
+        }
+
+        if (lower.contains("python")) {
+            return "🐍 **Python** is a high-level, interpreted programming language known for its clean syntax and readability.\n\n" +
+                   "📌 **Key Features:**\n" +
+                   "• **AI & Data Science:** Standard language for Machine Learning (PyTorch, TensorFlow) and Data Analysis (Pandas).\n" +
+                   "• **Backend Web Frameworks:** Rapid development with FastAPI, Django, and Flask.";
+        }
+
+        if (lower.contains("websocket") || lower.contains("ws")) {
+            return "🔌 **WebSockets** provide a full-duplex, persistent, real-time communication channel over a single TCP connection.\n\n" +
+                   "📌 **Key Concepts:**\n" +
+                   "• **HTTP Upgrade Handshake:** Begins as an HTTP request (`Upgrade: websocket`) and upgrades to persistent TCP framing.\n" +
+                   "• **Low Latency Messaging:** Eliminates HTTP polling overhead for instant real-time chat updates.";
+        }
+
+        if (lower.contains("sql") || lower.contains("database") || lower.contains("mongo")) {
+            return "🗄️ **Databases (SQL vs NoSQL)**\n\n" +
+                   "• **Relational DBs (PostgreSQL, MySQL):** Structured tables, schema enforcement, ACID compliance.\n" +
+                   "• **Document DBs (MongoDB Atlas):** Flexible BSON JSON documents, rapid horizontal scaling, dynamic schemas.";
+        }
+
         if (lower.contains("java")) {
             return "☕ **Java** is a popular, class-based, object-oriented programming language created by Sun Microsystems (now Oracle).\n\n" +
                    "📌 **Key Concepts:**\n" +
@@ -104,7 +133,7 @@ public class GeminiAiService {
         }
         
         if (lower.contains("who are you") || lower.contains("what can you do")) {
-            return "I am **Meta AI**, your personal intelligent assistant built into NexusChat. Ask me anything about programming, technology, explanations, or chat summaries!";
+            return "I am **Meta AI**, your personal intelligent assistant built into NexusChat. Ask me anything about Java, JavaScript, Python, WebSockets, Spring Boot, or chat summaries!";
         }
 
         if (lower.contains("summarize")) {
@@ -114,6 +143,6 @@ public class GeminiAiService {
         }
 
         return "💡 **Meta AI Assistant**\n\n" +
-               "I am here to help you! You asked: \"" + cleanPrompt + "\". Ask me anything about Java, Spring Boot, WebSockets, code explanations, or chat room summaries!";
+               "I am Meta AI, here to assist you! Ask me questions about Java, JavaScript, Python, WebSockets, Spring Boot, or code explanations!";
     }
 }
