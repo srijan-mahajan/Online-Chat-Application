@@ -111,21 +111,24 @@ public class GeminiAiService {
                    "• **Document DBs (MongoDB Atlas):** Flexible BSON JSON documents, rapid horizontal scaling, dynamic schemas.";
         }
 
-        if (lower.contains("java")) {
-            return "☕ **Java** is a popular, class-based, object-oriented programming language created by Sun Microsystems (now Oracle).\n\n" +
+        if (lower.equals("j") || lower.equals("java")) {
+            return "☕ **Java** is a class-based, object-oriented programming language designed for platform-independent enterprise backend applications.\n\n" +
                    "📌 **Key Concepts:**\n" +
-                   "• **WORA (Write Once, Run Anywhere):** Java code compiles into Bytecode executed by the Java Virtual Machine (JVM).\n" +
-                   "• **OOP Principles:** Built on Abstraction, Encapsulation, Inheritance, and Polymorphism.\n" +
-                   "• **Automatic Memory Management:** Features built-in Garbage Collection (GC) for safe memory control.\n" +
-                   "• **Enterprise Standard:** Widely used for Spring Boot microservices, backend APIs, and Android applications.";
+                   "• **JVM & Bytecode:** Runs anywhere Java Virtual Machine is installed.\n" +
+                   "• **Spring Boot:** Enterprise framework for microservices and REST APIs.";
         }
 
-        if (lower.contains("spring") || lower.contains("boot")) {
-            return "🌱 **Spring Boot** is a Java-based framework used to rapidly build production-ready backend microservices and Web APIs.\n\n" +
-                   "📌 **Key Features:**\n" +
-                   "• **Auto-Configuration:** Automatically configures Spring beans based on classpath dependencies.\n" +
-                   "• **Embedded Tomcat Server:** Allows deployment as a standalone JAR (`java -jar app.jar`).\n" +
-                   "• **Spring Starter Dependencies:** Simplifies Maven/Gradle dependency management (`spring-boot-starter-web`).";
+        if (lower.equals("js") || lower.contains("javascript")) {
+            return "⚡ **JavaScript (JS)** is a high-level programming language that powers dynamic interactive websites and Node.js backend servers.";
+        }
+
+        if (lower.contains("explain")) {
+            return "💡 **Meta AI Explanation Assistant**\n\n" +
+                   "I can explain any tech concept for you! Try asking:\n" +
+                   "• *\"What is Java?\"*\n" +
+                   "• *\"What is WebSockets?\"*\n" +
+                   "• *\"What is Spring Boot?\"*\n" +
+                   "• *\"What is JavaScript?\"*";
         }
 
         if (lower.contains("hi") || lower.contains("hello") || lower.contains("hey")) {
