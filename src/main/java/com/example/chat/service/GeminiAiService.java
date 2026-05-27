@@ -21,20 +21,39 @@ public class GeminiAiService {
 
     public GeminiAiService() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(10000); // 10 seconds connect timeout
-        factory.setReadTimeout(25000);    // 25 seconds read timeout for detailed AI generation
+        factory.setConnectTimeout(8000); // 8 seconds connect timeout
+        factory.setReadTimeout(20000);   // 20 seconds read timeout for live AI generation
         this.restTemplate = new RestTemplate(factory);
     }
 
     /**
-     * Sends prompt text to Google Gemini API with system instructions for clean structuring.
+     * Responds to user prompts with Live AI Generation (Google Gemini / Free LLM) or Knowledge Fallback.
      */
     public String askAi(String prompt) {
         String cleanPrompt = (prompt != null) ? prompt.trim() : "";
-        if (apiKey == null || apiKey.trim().isEmpty() || apiKey.contains("YOUR_GEMINI_API_KEY")) {
-            return generateFallbackResponse(cleanPrompt);
+        if (cleanPrompt.isEmpty()) {
+            return "Hello! I am **Meta AI**. How can I help you today?";
         }
 
+        // 1. Try Google Gemini API if key is provided
+        if (apiKey != null && !apiKey.trim().isEmpty() && !apiKey.contains("YOUR_GEMINI_API_KEY")) {
+            String geminiRes = callGeminiApi(cleanPrompt);
+            if (geminiRes != null && !geminiRes.trim().isEmpty()) {
+                return geminiRes;
+            }
+        }
+
+        // 2. Try 100% Free Live LLM Generation for ANY question (Zero API key needed)
+        String liveAiRes = callFreeLiveAi(cleanPrompt);
+        if (liveAiRes != null && !liveAiRes.trim().isEmpty()) {
+            return liveAiRes;
+        }
+
+        // 3. Fallback Knowledge Base
+        return generateFallbackResponse(cleanPrompt);
+    }
+
+    private String callGeminiApi(String cleanPrompt) {
         String structuredPrompt = 
             "System Directive: You are Meta AI, an intelligent AI Assistant in a real-time chat application. " +
             "Provide a helpful, well-structured, clear explanation using Markdown formatting (bold text, bullet points, and code blocks where appropriate).\n\n" +
@@ -74,78 +93,71 @@ public class GeminiAiService {
                 System.err.println("Gemini API call failed for [" + model + "]: " + e.getMessage());
             }
         }
+        return null;
+    }
 
-        return generateFallbackResponse(cleanPrompt);
+    private String callFreeLiveAi(String prompt) {
+        try {
+            String url = "https://text.pollinations.ai/";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> systemMsg = Map.of(
+                "role", "system",
+                "content", "You are Meta AI, an intelligent AI assistant in a real-time chat application. Format your response cleanly using Markdown formatting."
+            );
+            Map<String, Object> userMsg = Map.of(
+                "role", "user",
+                "content", prompt
+            );
+
+            Map<String, Object> body = Map.of("messages", List.of(systemMsg, userMsg));
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                return response.getBody().trim();
+            }
+        } catch (Exception e) {
+            System.err.println("Free Live AI API call failed: " + e.getMessage());
+        }
+        return null;
     }
 
     private String generateFallbackResponse(String prompt) {
         String cleanPrompt = (prompt != null) ? prompt.trim() : "";
         String lower = cleanPrompt.toLowerCase();
         
-        if (lower.contains("javascript") || lower.contains("js")) {
-            return "⚡ **JavaScript (JS)** is a high-level, multi-paradigm programming language that powers dynamic interactive web applications and Node.js backend servers.\n\n" +
-                   "📌 **Key Concepts:**\n" +
-                   "• **Event-Driven & Asynchronous:** Uses an Event Loop, Promises, and `async/await` for non-blocking I/O.\n" +
-                   "• **Single-Threaded Execution:** Executes code sequentially while delegating async events to background workers.\n" +
-                   "• **Full-Stack Ecosystem:** Powers modern frontend UI frameworks (React, Vue) and backend services (Node.js, Express).\n" +
-                   "• **Dynamic & Weakly Typed:** Variables are declared dynamically with `const`, `let`, and `var`.";
+        if (lower.contains("jwt") || lower.contains("json web token")) {
+            return "🔐 **JSON Web Token (JWT)** is an open standard (RFC 7519) for securely transmitting information between client and server as a JSON object.\n\n" +
+                   "📌 **Structure of a JWT:**\n" +
+                   "1. **Header:** Algorithm used (e.g. HS256/RS256) & token type.\n" +
+                   "2. **Payload:** Claims/User Data (e.g. `sub: shyam`, `exp: 1788539826`).\n" +
+                   "3. **Signature:** Created by hashing Header + Payload with a secret key on the server.\n\n" +
+                   "💡 **Why use JWT?** Statetess authentication! The server does not need to query session store on every request.";
         }
 
-        if (lower.contains("python")) {
-            return "🐍 **Python** is a high-level, interpreted programming language known for its clean syntax and readability.\n\n" +
-                   "📌 **Key Features:**\n" +
-                   "• **AI & Data Science:** Standard language for Machine Learning (PyTorch, TensorFlow) and Data Analysis (Pandas).\n" +
-                   "• **Backend Web Frameworks:** Rapid development with FastAPI, Django, and Flask.";
+        if (lower.contains("javascript") || lower.contains("js")) {
+            return "⚡ **JavaScript (JS)** is a high-level, multi-paradigm programming language that powers dynamic interactive web applications and Node.js backend servers.";
+        }
+
+        if (lower.contains("java") || lower.equals("j")) {
+            return "☕ **Java** is a class-based, object-oriented programming language designed for platform-independent enterprise applications via JVM.";
+        }
+
+        if (lower.contains("spring") || lower.contains("boot")) {
+            return "🌱 **Spring Boot** is a Java-based framework used to rapidly build production-ready backend microservices and Web APIs.";
         }
 
         if (lower.contains("websocket") || lower.contains("ws")) {
-            return "🔌 **WebSockets** provide a full-duplex, persistent, real-time communication channel over a single TCP connection.\n\n" +
-                   "📌 **Key Concepts:**\n" +
-                   "• **HTTP Upgrade Handshake:** Begins as an HTTP request (`Upgrade: websocket`) and upgrades to persistent TCP framing.\n" +
-                   "• **Low Latency Messaging:** Eliminates HTTP polling overhead for instant real-time chat updates.";
-        }
-
-        if (lower.contains("sql") || lower.contains("database") || lower.contains("mongo")) {
-            return "🗄️ **Databases (SQL vs NoSQL)**\n\n" +
-                   "• **Relational DBs (PostgreSQL, MySQL):** Structured tables, schema enforcement, ACID compliance.\n" +
-                   "• **Document DBs (MongoDB Atlas):** Flexible BSON JSON documents, rapid horizontal scaling, dynamic schemas.";
-        }
-
-        if (lower.equals("j") || lower.equals("java")) {
-            return "☕ **Java** is a class-based, object-oriented programming language designed for platform-independent enterprise backend applications.\n\n" +
-                   "📌 **Key Concepts:**\n" +
-                   "• **JVM & Bytecode:** Runs anywhere Java Virtual Machine is installed.\n" +
-                   "• **Spring Boot:** Enterprise framework for microservices and REST APIs.";
-        }
-
-        if (lower.equals("js") || lower.contains("javascript")) {
-            return "⚡ **JavaScript (JS)** is a high-level programming language that powers dynamic interactive websites and Node.js backend servers.";
-        }
-
-        if (lower.contains("explain")) {
-            return "💡 **Meta AI Explanation Assistant**\n\n" +
-                   "I can explain any tech concept for you! Try asking:\n" +
-                   "• *\"What is Java?\"*\n" +
-                   "• *\"What is WebSockets?\"*\n" +
-                   "• *\"What is Spring Boot?\"*\n" +
-                   "• *\"What is JavaScript?\"*";
+            return "🔌 **WebSockets** provide full-duplex, persistent real-time communication channels over a single TCP connection.";
         }
 
         if (lower.contains("hi") || lower.contains("hello") || lower.contains("hey")) {
             return "Hello! I am **Meta AI**. How can I help you today?";
         }
-        
-        if (lower.contains("who are you") || lower.contains("what can you do")) {
-            return "I am **Meta AI**, your personal intelligent assistant built into NexusChat. Ask me anything about Java, JavaScript, Python, WebSockets, Spring Boot, or chat summaries!";
-        }
-
-        if (lower.contains("summarize")) {
-            return "📌 **AI Room Summary**\n" +
-                   "• **Key Topics:** Team discussed project tasks, WebSockets, and system setup.\n" +
-                   "• **Updates:** Confirmed implementation details and server configuration.";
-        }
 
         return "💡 **Meta AI Assistant**\n\n" +
-               "I am Meta AI, here to assist you! Ask me questions about Java, JavaScript, Python, WebSockets, Spring Boot, or code explanations!";
+               "I am Meta AI, here to assist you with any questions! Ask me about JWT, Java, Spring Boot, WebSockets, JavaScript, or any topic!";
     }
 }
