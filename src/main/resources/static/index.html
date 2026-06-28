@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusChat - Real-Time Collaboration</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=2">
+    <script src="app.js?v=2" defer></script>
+</head>
+<body>
+    <div class="app-background"></div>
+
+    <!-- Login/Connection Screen -->
+    <div id="login-container" class="glass-panel active">
+        <div class="login-header">
+            <div class="logo-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <h1>NexusChat</h1>
+            <p>Real-time rooms & direct messaging powered by WebSockets</p>
+        </div>
+
+        <!-- Auth Switch Tabs -->
+        <div class="auth-tabs">
+            <button id="tab-login" class="tab-btn active">Login</button>
+            <button id="tab-register" class="tab-btn">Register</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form active">
+            <div class="input-group">
+                <label for="login-email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                    <input type="email" id="login-email" placeholder="e.g. alex@nexus.com" required autocomplete="email">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+            </div>
+            <button type="submit" class="primary-btn">
+                <span>Login</span>
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="auth-form">
+            <div class="input-group">
+                <label for="register-username">Username</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user input-icon"></i>
+                    <input type="text" id="register-username" placeholder="e.g. AlexCoder" maxlength="15" required autocomplete="username">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="register-email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                    <input type="email" id="register-email" placeholder="e.g. alex@nexus.com" required autocomplete="email">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="register-password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="register-password" placeholder="••••••••" required autocomplete="new-password">
+                </div>
+            </div>
+            <button type="submit" class="primary-btn">
+                <span>Create Account</span>
+                <i class="fa-solid fa-user-plus"></i>
+            </button>
+        </form>
+
+        <!-- Error / Status messages -->
+        <div id="login-error" class="error-msg hidden">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="error-text">Invalid email or password.</span>
+        </div>
+        <div id="register-success" class="success-msg hidden">
+            <i class="fa-solid fa-circle-check"></i>
+            <span id="success-text">Registration successful! Please log in.</span>
+        </div>
+    </div>
+
+    <!-- Main Application Dashboard -->
+    <div id="chat-dashboard" class="glass-panel hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div id="user-avatar" class="avatar">U</div>
+                    <div class="user-info">
+                        <span id="user-display-name" class="username">Guest</span>
+                        <span class="user-status"><span class="status-indicator online"></span>Online</span>
+                    </div>
+                    <!-- Logout Trigger -->
+                    <button id="logout-btn" title="Logout" class="logout-btn-icon">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Join / Create Room Section -->
+            <div class="sidebar-section">
+                <h3><i class="fa-solid fa-cube"></i> Rooms</h3>
+                <div class="room-action-form">
+                    <div class="input-wrapper-small">
+                        <input type="text" id="room-code-input" placeholder="Room Code (e.g. ROOM12)" maxlength="10" autocomplete="off">
+                        <button id="generate-code-btn" title="Generate Code"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                    </div>
+                    <button id="join-room-btn" class="secondary-btn-small">Join / Create</button>
+                </div>
+            </div>
+
+            <!-- Rooms List -->
+            <div class="sidebar-section scrollable-list">
+                <ul id="rooms-list" class="sidebar-list">
+                    <!-- Dynamic room items -->
+                </ul>
+            </div>
+
+            <!-- Active Users List -->
+            <div class="sidebar-section scrollable-list border-top">
+                <h3><i class="fa-solid fa-users"></i> Users Network (<span id="online-count">0</span>)</h3>
+                <ul id="users-list" class="sidebar-list">
+                    <!-- Dynamic user items -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <!-- Default Welcome State -->
+            <div id="welcome-chat-view" class="chat-placeholder">
+                <div class="placeholder-content">
+                    <i class="fa-regular fa-comments placeholder-icon"></i>
+                    <h2>Welcome to NexusChat</h2>
+                    <p>Select an online or offline user from the sidebar to send a direct message, or enter a room code to join a public discussion room.</p>
+                </div>
+            </div>
+
+            <!-- Active Chat View -->
+            <div id="active-chat-view" class="chat-view hidden">
+                <header class="chat-header">
+                    <div class="chat-title-container">
+                        <div id="chat-avatar" class="avatar small">R</div>
+                        <div>
+                            <h2 id="chat-title">Room Name</h2>
+                            <span id="chat-subtitle" class="subtitle">0 users online</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button id="leave-chat-btn" class="danger-btn hidden">
+                            <i class="fa-solid fa-right-from-bracket"></i> Leave Room
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Messages Feed -->
+                <div id="messages-container" class="messages-feed">
+                    <!-- Messages will be injected here -->
+                </div>
+
+                <!-- File Preview Container -->
+                <div id="media-preview-container" class="media-preview-bar hidden">
+                    <div class="preview-thumbnail-wrapper">
+                        <img id="media-preview-img" src="" alt="preview" class="hidden">
+                        <div id="media-preview-file" class="file-preview-icon hidden"><i class="fa-solid fa-file-arrow-up"></i></div>
+                        <div class="preview-details">
+                            <span id="media-preview-name" class="file-name">filename.png</span>
+                            <span id="media-preview-size" class="file-size">1.2 MB</span>
+                        </div>
+                    </div>
+                    <button type="button" id="cancel-media-btn" class="close-preview-btn"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- Input area -->
+                <footer class="chat-footer">
+                    <form id="message-form" class="message-input-form">
+                        <button type="button" id="attach-btn" class="attach-btn" title="Share file or image">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </button>
+                        <input type="file" id="media-file-input" accept="image/*,application/pdf,text/*" class="hidden">
+                        
+                        <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+                        <button type="submit" class="send-btn">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </footer>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
