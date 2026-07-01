@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusChat - Interview Preparation Guide</title>
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --primary-dark: #6a1b9a;
+            --text-main: #2d3748;
+            --text-light: #718096;
+            --bg-main: #f7fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --accent-green: #38a169;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 24px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            margin: 0 0 8px 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-card {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .question-card:last-child {
+            border-bottom: none;
+        }
+
+        .question {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: #1a202c;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .question-number {
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 3px;
+        }
+
+        .testing-scope {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .answer-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 10px 0;
+        }
+
+        .answer-heading {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .answer-text {
+            margin: 0;
+            font-size: 0.98rem;
+            color: var(--text-main);
+        }
+
+        /* Printable PDF modifications */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .question-card {
+                page-break-inside: avoid;
+            }
+            .section-title {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NexusChat Placement Preparation Guide</h1>
+            <p class="subtitle">Complete technical Q&A from absolute basics to advanced system architecture</p>
+        </div>
+
+        <!-- SECTION 1 -->
+        <div class="section-title">Module 1: Frontend & JavaScript Basics</div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q1</span>
+                <span>What is "Vanilla JavaScript"?</span>
+            </div>
+            <div class="testing-scope">Tests: Raw language understanding</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">JavaScript is the core scripting language executed by browsers. "Vanilla JavaScript" simply refers to writing plain, raw JavaScript without using external helper libraries or frameworks (such as jQuery, React, or Angular).</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"Vanilla JavaScript is raw, standard JavaScript code executed directly by the browser's engine. It requires no compilers or heavy external libraries, which makes the web application fast, lightweight, and ensures we have direct control over browser APIs and DOM manipulation."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q2</span>
+                <span>What is the DOM (Document Object Model)?</span>
+            </div>
+            <div class="testing-scope">Tests: Browser rendering principles</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">The browser converts HTML tags into a tree of JavaScript objects. This tree structure represents the current webpage and is called the Document Object Model.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"The Document Object Model (DOM) is an object-oriented representation of the HTML document. It represents the page structure as a tree of nodes. JavaScript uses the DOM API (such as `document.getElementById`) to dynamically read, modify, add, or delete HTML elements and styles on the page in response to user actions."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q3</span>
+                <span>What does `document.addEventListener("DOMContentLoaded", ...)` do in app.js?</span>
+            </div>
+            <div class="testing-scope">Tests: Client-side lifecycle execution</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">If JavaScript executes before the HTML is fully downloaded and parsed, it won't find the target DOM nodes, causing errors. This event waits until the HTML template is completely constructed.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"It is an event listener that waits until the browser has fully loaded and parsed the HTML structure of the page, without waiting for stylesheets or images to load. This ensures that all DOM elements (like inputs, buttons, and panels) exist in memory before our JavaScript code runs event bindings on them."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q4</span>
+                <span>What is the difference between `let`, `const`, and `var` in JavaScript?</span>
+            </div>
+            <div class="testing-scope">Tests: Scoping and variable declaration rules</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">`var` is function-scoped and can be reassigned. `let` and `const` are block-scoped. `const` creates a read-only reference that cannot be reassigned.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"`const` is block-scoped and represents a constant reference; its value cannot be re-assigned once initialized. `let` is block-scoped and is used for variables whose values are expected to change over time. `var` is older, function-scoped, and allows variable hoisting, which can lead to bugs. We avoid using `var` in modern JavaScript."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q5</span>
+                <span>What is localStorage, and how is it used in this project?</span>
+            </div>
+            <div class="testing-scope">Tests: Browser data caching and persistence</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Local Storage stores string data inside the user's browser with no expiration date, remaining saved even when the browser is closed or restarted.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"Local Storage is a web storage API that allows websites to store key-value string pairs persistently in the user's browser. In this project, I used `localStorage.setItem` to save the user's JWT token and username upon a successful login. On page load, the app checks if a token exists; if it does, it attempts an automatic login, bypassing the connection form."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q6</span>
+                <span>What is a FileReader, and how is it used to send images?</span>
+            </div>
+            <div class="testing-scope">Tests: Binary file streaming and serialization</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Browsers cannot write raw local file bytes directly to standard WebSocket text pipelines. The `FileReader` translates files into Base64 format, which represents binary files as a text string.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"The `FileReader` object lets web applications asynchronously read the contents of files stored on the user's computer. When a user selects an image or document, `FileReader` reads it and converts it into a Base64 Data URL. This string is then packed into our JSON message payload and sent across the WebSocket channel."</p>
+            </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="section-title">Module 2: WebSockets & Protocols</div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q7</span>
+                <span>What is the difference between HTTP and WebSockets? Why choose WebSockets?</span>
+            </div>
+            <div class="testing-scope">Tests: Core network protocol knowledge</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">HTTP is uni-directional (request-response). WebSockets provide a stateful, bi-directional persistent connection over a single TCP connection.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"HTTP requires the client to request data first, which forces inefficient techniques like long-polling to check for new messages. WebSockets establish a single, long-lived TCP connection, allowing the server to push messages to the client instantly as they arrive. This reduces packet header overhead and latency, which is essential for a real-time chat application."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q8</span>
+                <span>What does it mean that a WebSocket is "Full-Duplex" and "Stateful"?</span>
+            </div>
+            <div class="testing-scope">Tests: Socket terminology definitions</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Full-duplex channels allow data to travel both directions simultaneously. Stateful means the socket remains open and the server maintains references to client sessions.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"Full-Duplex means communication flows in both directions simultaneously over a single channel. Stateful means the connection remains open, and the server retains active information about the connection state (like who is logged in and their socket session). This contrasts with HTTP, which is stateless and closes the connection after every response."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q9</span>
+                <span>Explain the WebSocket Handshake process.</span>
+            </div>
+            <div class="testing-scope">Tests: Connection upgrade life cycle</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">The connection begins as standard HTTP but includes upgrade headers. Once approved, HTTP is bypassed and the connection switches to WebSocket protocols.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"The handshake is the bridge between HTTP and WebSockets. The connection starts as a standard HTTP GET request. The client sends a header `Upgrade: websocket`. If the server accepts, it returns an HTTP 101 Switching Protocols response. The TCP connection remains open, and both parties switch to sending WebSocket data frames."</p>
+            </div>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="section-title">Module 3: Security & Token Authentication</div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q10</span>
+                <span>What is a JWT (JSON Web Token)? Describe its structure.</span>
+            </div>
+            <div class="testing-scope">Tests: Token composition and standards</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">JWT is a signed, compact JSON string consisting of three parts separated by dots: Header (metadata), Payload (data fields), and Signature (tamper verification).</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"A JWT is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. It consists of three parts: (1) Header (specifies the hashing algorithm), (2) Payload (contains claims like username), and (3) Signature (hash generated by combining header, payload, and a secret server key to verify token authenticity)."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q11</span>
+                <span>What is the difference between encryption and hashing?</span>
+            </div>
+            <div class="testing-scope">Tests: Cryptographic fundamentals</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Hashing is a one-way mathematical function (cannot be unscrambled). Encryption is a two-way function (can be decrypted using a secret key).</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"Hashing is a one-way cryptographic function. Once data is hashed (e.g., using BCrypt), it cannot be reversed back to plain text. We hash passwords so that even if the database is leaked, raw passwords remain protected. Encryption is a two-way function; data is scrambled using a key and can be decrypted back to plain text later if the correct key is provided."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q12</span>
+                <span>How does BCrypt work, and why is it preferred over SHA-256 for passwords?</span>
+            </div>
+            <div class="testing-scope">Tests: Password protection algorithms</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">SHA-256 is fast, making it easy to brute-force if database rows are exposed. BCrypt introduces salt and a work-factor (computational delay), slowing down potential attackers.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"SHA-256 is designed to be fast, which makes it vulnerable to GPU-based brute-force attacks if the database leaks. BCrypt is slow by design. It implements a configurable work factor (computational rounds) to slow down hashing, making brute-force attacks computationally impractical. Furthermore, it automatically salts each password, ensuring that two users with the same password have completely different hashes, protecting against Rainbow Table attacks."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q13</span>
+                <span>How does the WebSocket Handshake upgrade interceptor secure the connection?</span>
+            </div>
+            <div class="testing-scope">Tests: Secure handshaking design</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">We extract the token query parameter, run JWT validation, and reject connection upgrades if the token is invalid or missing, blocking unauthorized sockets immediately.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"The client sends an HTTP GET request with an Upgrade header to the `/chat` endpoint, passing the JWT in the URL query parameter. Before Spring Boot upgrades the connection to a WebSocket, our custom `AuthHandshakeInterceptor` intercepts it. It validates the JWT. If the token is valid, it extracts the username, saves it into the session attributes map, and returns `true` to allow the handshake. If invalid, it returns HTTP 401 Unauthorized, blocking the connection before the WebSocket session is even allocated."</p>
+            </div>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="section-title">Module 4: Database (MongoDB)</div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q14</span>
+                <span>Why did you choose MongoDB instead of a Relational Database (SQL)?</span>
+            </div>
+            <div class="testing-scope">Tests: Database engine selection trade-offs</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Chat applications require write-heavy, unstructured structures. JSON BSON structures mapping with WebSockets fit document-based engines without relational joins.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"Chat applications are highly write-heavy and have semi-structured data schemas. A message might be simple text, or it might contain media links, file metadata, and dynamic properties. Storing this in a relational database requires nullable columns or complex table joins. MongoDB is a document-based NoSQL database that allows us to store messages as single documents. This eliminates joins, matches the JSON format of WebSockets, and allows easy horizontal scaling using sharding."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q15</span>
+                <span>How does your private message history query work in MongoDB?</span>
+            </div>
+            <div class="testing-scope">Tests: NoSQL logical filters</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Retrieving direct chat threads requires searching for records where A sends to B or B sends to A, ordered chronologically.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"In `MessageRepository.java`, I wrote a custom MongoDB query using the `$or` operator. It searches for documents where `sender` is User A and `recipient` is User B, OR `sender` is User B and `recipient` is User A. I also added a sort definition `{'timestamp': 1}` to ensure the records are returned in chronological order for the chat timeline."</p>
+            </div>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="section-title">Module 5: System Architecture & Scaling</div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q16</span>
+                <span>Walk me through the step-by-step path of a private message from Sender to Recipient.</span>
+            </div>
+            <div class="testing-scope">Tests: End-to-end trace execution mapping</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Understanding the flow of data across frontend inputs, WebSocket frames, Spring event switch loops, database writes, and target session delivery.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"First, the client inputs text, clicks Send, and JavaScript packs it as JSON of type `SEND_PRIVATE_MSG`. It is sent over the WebSocket and intercepted by `ChatWebSocketHandler`. The server immediately saves the message to MongoDB. It then looks up the recipient's name in our `nicknameToSession` map. If online, the server writes the message directly to the recipient's socket. It also sends a confirmation frame back to the sender's socket to render the chat bubble instantly."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q17</span>
+                <span>How did you implement the "Offline Messaging" logic?</span>
+            </div>
+            <div class="testing-scope">Tests: State management design</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Decoupled socket routing from database logging. Senders write logs directly to database collections, which offline recipients pull when they connect.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"When User A sends a message to User B, the server always persists the message to MongoDB first. The server then checks if User B is online. If they are offline, the server skips the socket broadcast step and sends a success confirmation only to User A. When User B logs in later, their browser requests history (`GET_HISTORY`) for their chat with User A, and the server fetches all offline messages from MongoDB and renders them."</p>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="question">
+                <span class="question-number">Q18</span>
+                <span>How would you scale this chat application to support 100,000 active users?</span>
+            </div>
+            <div class="testing-scope">Tests: Advanced system design & scaling</div>
+            <div class="answer-box">
+                <div class="answer-heading">Core Concept</div>
+                <p class="answer-text">Single instances hold active socket references in-memory. Multi-node setups require a distributed pub-sub backplane to sync socket events.</p>
+            </div>
+            <div class="answer-box">
+                <div class="answer-heading">Ideal Interview Answer</div>
+                <p class="answer-text">"Currently, socket sessions are stored in-memory on a single server, which limits vertical scaling. To scale horizontally, I would deploy a load balancer and spin up multiple server nodes. I would integrate a **Redis Pub/Sub** or **Kafka** message broker as a backend channel. When a message is sent, the handling node publishes it to Redis. All other server instances listen to Redis, locate the recipient if connected to their local nodes, and route the message, ensuring cross-server communication."</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
