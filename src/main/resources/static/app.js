@@ -109,6 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
         metaAiBtn.addEventListener("click", () => selectChat("private", "Meta AI"));
     }
 
+    const userSearchInput = document.getElementById("user-search-input");
+    if (userSearchInput) {
+        userSearchInput.addEventListener("input", (e) => {
+            renderUserList(e.target.value.trim().toLowerCase());
+        });
+    }
+
     checkAutoLogin();
 });
 
@@ -430,14 +437,24 @@ function clearUnread(key) {
 }
 
 // --- User List Rendering ---
-function renderUserList() {
+function renderUserList(searchQuery = "") {
     usersList.innerHTML = "";
     if (usersDb.length === 0) {
         usersList.innerHTML = `<li class="sidebar-list-item" style="cursor: default; color: var(--text-muted); font-size: 0.85rem;">No registered users</li>`;
         return;
     }
 
-    const sortedUsers = [...usersDb].sort((a, b) => {
+    let filteredUsers = usersDb;
+    if (searchQuery) {
+        filteredUsers = usersDb.filter(u => u.username.toLowerCase().includes(searchQuery));
+    }
+
+    if (filteredUsers.length === 0) {
+        usersList.innerHTML = `<li class="sidebar-list-item" style="cursor: default; color: var(--text-muted); font-size: 0.85rem;">No contacts matching "${escapeHTML(searchQuery)}"</li>`;
+        return;
+    }
+
+    const sortedUsers = [...filteredUsers].sort((a, b) => {
         if (a.status === b.status) {
             return a.username.localeCompare(b.username);
         }

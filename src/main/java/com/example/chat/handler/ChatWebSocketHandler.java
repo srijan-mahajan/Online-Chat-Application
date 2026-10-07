@@ -46,12 +46,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 "siddharth", "pooja", "kabir", "rahul", "dev"
             );
             
-            List<User> existingUsers = userRepository.findAll();
-            for (User u : existingUsers) {
-                if (!seedUsers.contains(u.getUsername())) {
-                    userRepository.delete(u);
-                }
-            }
+            // Only seed default demo users if they don't exist yet (never delete registered users)
 
             org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
             for (String username : seedUsers) {

@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=6">
-    <script src="app.js?v=6" defer></script>
+    <link rel="stylesheet" href="style.css?v=8">
+    <script src="app.js?v=8" defer></script>
 </head>
 <body>
     <div id="login-container" class="active">
@@ -109,53 +109,67 @@
                 </div>
             </div>
 
-            <div class="sidebar-section scrollable-list">
-                <h3><i class="fa-solid fa-users"></i> Chats (<span id="online-count">0</span>)</h3>
+            <!-- Search Contacts / Users Bar -->
+            <div class="sidebar-search-box">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="user-search-input" placeholder="Search chats or names..." autocomplete="off">
+                </div>
+            </div>
+
+            <!-- Scrollable Contacts/Chats List -->
+            <div class="sidebar-chats-container">
+                <div class="section-title-row">
+                    <h3><i class="fa-solid fa-users"></i> Contacts & Chats (<span id="online-count">0</span>)</h3>
+                </div>
                 <ul id="users-list" class="sidebar-list">
                 </ul>
             </div>
 
+            <!-- Group & Rooms Section with Create Button -->
             <div class="sidebar-section border-top">
-                <h3><i class="fa-solid fa-cube"></i> Rooms</h3>
+                <div class="section-title-row">
+                    <h3><i class="fa-solid fa-people-group"></i> Groups & Rooms</h3>
+                </div>
                 <div class="room-action-form">
                     <div class="input-wrapper-small">
-                        <input type="text" id="room-code-input" placeholder="Room Code (e.g. TECH)" maxlength="10" autocomplete="off">
-                        <button id="generate-code-btn" title="Generate Code"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                        <input type="text" id="room-code-input" placeholder="Group / Room Code" maxlength="15" autocomplete="off">
+                        <button id="generate-code-btn" type="button" title="Generate Random Code"><i class="fa-solid fa-dice"></i></button>
                     </div>
-                    <button id="join-room-btn" class="secondary-btn-small">Join / Create Room</button>
+                    <button id="join-room-btn" type="button" class="create-group-btn">
+                        <i class="fa-solid fa-plus"></i> Create / Join Group
+                    </button>
                 </div>
-                <ul id="rooms-list" class="sidebar-list" style="margin-top: 8px;">
+                <ul id="rooms-list" class="sidebar-list rooms-list-scroll" style="margin-top: 8px;">
                 </ul>
             </div>
         </aside>
 
         <main class="chat-area">
-            <div id="welcome-chat-view" class="chat-placeholder">
-                <div class="placeholder-content">
-                    <i class="fa-regular fa-comments placeholder-icon"></i>
-                    <h2>NexusChat Messaging</h2>
-                    <p>Select a user from the sidebar for direct messaging, or enter a room code to join a public group chat.</p>
-                </div>
+            <div id="welcome-chat-view" class="welcome-view">
+                <div class="welcome-icon"><i class="fa-regular fa-comments"></i></div>
+                <h2>NexusChat Messaging</h2>
+                <p>Select a contact from the sidebar for direct messaging, or create a group room to collaborate.</p>
             </div>
 
-            <div id="active-chat-view" class="chat-view hidden">
+            <div id="active-chat-view" class="active-chat-view hidden">
                 <header class="chat-header">
-                    <div class="chat-title-container">
+                    <div class="chat-header-info">
                         <button id="back-to-sidebar-btn" class="back-btn mobile-only" title="Back to chats"><i class="fa-solid fa-arrow-left"></i></button>
                         <div id="chat-avatar" class="avatar small">R</div>
-                        <div>
+                        <div class="chat-title-container">
                             <h2 id="chat-title">Room Name</h2>
                             <span id="chat-subtitle" class="subtitle">0 users online</span>
                         </div>
                     </div>
-                    <div class="header-actions">
-                        <div class="e2e-badge" title="End-to-End Encrypted (AES-256)">
-                            <i class="fa-solid fa-shield-halved"></i> E2E Encrypted
+                    <div class="chat-actions">
+                        <div class="header-e2e-badge" title="End-to-End Encrypted (AES-256)">
+                            <i class="fa-solid fa-shield-halved"></i> <span>E2E Encrypted</span>
                         </div>
-                        <button id="ai-summarize-btn" class="ai-btn hidden" title="Summarize Room with AI">
+                        <button id="ai-summarize-btn" class="header-btn hidden" title="Summarize Room with AI">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> AI Summary
                         </button>
-                        <button id="leave-chat-btn" class="danger-btn hidden">
+                        <button id="leave-chat-btn" class="header-btn danger hidden">
                             <i class="fa-solid fa-right-from-bracket"></i> Leave Room
                         </button>
                     </div>
