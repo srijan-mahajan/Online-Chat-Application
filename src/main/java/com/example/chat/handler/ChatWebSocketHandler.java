@@ -130,6 +130,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             case "GET_HISTORY":
                 handleGetHistory(session, chatMessage);
                 break;
+            case "DELETE_MSG":
+                handleDeleteMessage(session, chatMessage);
+                break;
             default:
                 sendError(session, "Unknown message type: " + chatMessage.getType());
         }
@@ -260,6 +263,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         // 2. Broadcast message to online members
         ChatMessage forwardMsg = new ChatMessage("CHAT_ROOM", nickname, chatMessage.getContent());
+        forwardMsg.setMessageId(dbMsg.getId());
+        forwardMsg.setDeleted(dbMsg.getDeleted());
         forwardMsg.setRoomCode(roomCode);
         forwardMsg.setMediaData(chatMessage.getMediaData());
         forwardMsg.setMediaName(chatMessage.getMediaName());
@@ -343,6 +348,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         WebSocketSession recipientSession = nicknameToSession.get(recipient);
         if (recipientSession != null && recipientSession.isOpen() && !recipientSession.getId().equals(session.getId())) {
             ChatMessage forwardMsg = new ChatMessage("CHAT_PRIVATE", senderNickname, chatMessage.getContent());
+            forwardMsg.setMessageId(dbMsg.getId());
+            forwardMsg.setDeleted(dbMsg.getDeleted());
             forwardMsg.setRecipient(recipient);
             forwardMsg.setMediaData(chatMessage.getMediaData());
             forwardMsg.setMediaName(chatMessage.getMediaName());
@@ -353,6 +360,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
 
         ChatMessage confirmMsg = new ChatMessage("CHAT_PRIVATE", senderNickname, chatMessage.getContent());
+        confirmMsg.setMessageId(dbMsg.getId());
+        confirmMsg.setDeleted(dbMsg.getDeleted());
         confirmMsg.setRecipient(recipient);
         confirmMsg.setMediaData(chatMessage.getMediaData());
         confirmMsg.setMediaName(chatMessage.getMediaName());
@@ -411,6 +420,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             List<ChatMessage> chatHistory = history.stream().map(m -> {
                 String type = (m.getRoomCode() != null) ? "CHAT_ROOM" : "CHAT_PRIVATE";
                 ChatMessage msg = new ChatMessage(type, m.getSender(), m.getContent());
+                msg.setMessageId(m.getId());
+                msg.setDeleted(m.getDeleted());
                 msg.setRoomCode(m.getRoomCode());
                 msg.setRecipient(m.getRecipient());
                 msg.setMediaData(m.getMediaData());
@@ -431,6 +442,74 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         } catch (Exception e) {
             sendError(session, "Failed to load chat logs from database: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void handleDeleteMessage(WebSocketSession session, ChatMessage chatMessage) throws IOException {
+        String requester = sessionToNickname.get(session.getId());
+        if (requester == null) {
+            sendError(session, "Unauthorized");
+            return;
+        }
+
+        String messageId = chatMessage.getMessageId();
+        if (messageId == null || messageId.trim().isEmpty()) {
+            sendError(session, "Message ID is required to delete a message");
+            return;
+        }
+
+        Optional<Message> optMsg = messageRepository.findById(messageId);
+        if (optMsg.isEmpty()) {
+            sendError(session, "Message not found");
+            return;
+        }
+
+        Message msg = optMsg.get();
+
+        // Security check: Only the sender can delete their own message
+        if (!requester.equalsIgnoreCase(msg.getSender())) {
+            sendError(session, "You can only delete messages you sent");
+            return;
+        }
+
+        // Soft delete: clear content, clear media, mark deleted
+        msg.setContent("This message was deleted");
+        msg.setMediaData(null);
+        msg.setMediaName(null);
+        msg.setMediaType(null);
+        msg.setDeleted(true);
+
+        try {
+            messageRepository.save(msg);
+        } catch (Exception e) {
+            sendError(session, "Failed to delete message in database: " + e.getMessage());
+            return;
+        }
+
+        // Prepare realtime delete broadcast notification
+        ChatMessage deleteNotification = new ChatMessage("MESSAGE_DELETED", requester, "This message was deleted");
+        deleteNotification.setMessageId(msg.getId());
+        deleteNotification.setDeleted(true);
+        deleteNotification.setRoomCode(msg.getRoomCode());
+        deleteNotification.setRecipient(msg.getRecipient());
+        deleteNotification.setTimestamp(msg.getTimestamp());
+
+        String jsonNotification = objectMapper.writeValueAsString(deleteNotification);
+        TextMessage textMessage = new TextMessage(jsonNotification);
+
+        if (msg.getRoomCode() != null && !msg.getRoomCode().trim().isEmpty()) {
+            // Broadcast deletion to all users in the room
+            broadcastToRoom(msg.getRoomCode().trim().toUpperCase(), deleteNotification);
+        } else if (msg.getRecipient() != null) {
+            // Notify recipient session if online
+            WebSocketSession recipientSession = nicknameToSession.get(msg.getRecipient());
+            if (recipientSession != null && recipientSession.isOpen()) {
+                recipientSession.sendMessage(textMessage);
+            }
+            // Also notify sender session (or confirm)
+            if (session.isOpen()) {
+                session.sendMessage(textMessage);
+            }
         }
     }
 

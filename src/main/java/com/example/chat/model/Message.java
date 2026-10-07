@@ -18,6 +18,7 @@ public class Message {
     private String mediaData; // Base64 representation of shared media
     private String mediaName;
     private String mediaType;
+    private Boolean deleted = false;
 
     public Message() {
     }
@@ -103,5 +104,13 @@ public class Message {
 
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
+    }
+
+    public Boolean getDeleted() {
+        return deleted != null && deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

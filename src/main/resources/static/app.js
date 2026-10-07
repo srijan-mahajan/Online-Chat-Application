@@ -413,6 +413,10 @@ function handleServerMessage(msg) {
                 scrollToBottom();
             }
             break;
+
+        case "MESSAGE_DELETED":
+            handleMessageDeletedEvent(msg);
+            break;
     }
 }
 
@@ -669,8 +673,13 @@ function appendMessageToUI(msg) {
         const nameLabel = isOutgoing ? "You" : msg.sender;
         const avatarLetter = msg.sender.substring(0, 2).toUpperCase();
         
+        const isDeleted = msg.deleted === true || msg.content === "This message was deleted";
+        if (msg.messageId) {
+            wrapper.setAttribute("data-message-id", msg.messageId);
+        }
+        
         let mediaHtml = "";
-        if (msg.mediaData) {
+        if (!isDeleted && msg.mediaData) {
             if (msg.mediaType && msg.mediaType.startsWith("image/")) {
                 mediaHtml = `<img src="${msg.mediaData}" class="msg-media-img" alt="shared image" onclick="window.open('${msg.mediaData}')">`;
             } else {
@@ -687,7 +696,7 @@ function appendMessageToUI(msg) {
         }
         
         let rawContent = msg.content;
-        if (rawContent && typeof CryptoJS !== "undefined" && rawContent.startsWith("ENC:")) {
+        if (!isDeleted && rawContent && typeof CryptoJS !== "undefined" && rawContent.startsWith("ENC:")) {
             try {
                 let key = activeChat ? activeChat.target : "nexus_key";
                 let bytes = CryptoJS.AES.decrypt(rawContent.substring(4), key);
@@ -695,11 +704,27 @@ function appendMessageToUI(msg) {
                 if (decrypted) rawContent = decrypted;
             } catch (err) {}
         }
-        const contentHtml = rawContent ? `<div class="msg-content">${escapeHTML(rawContent)}</div>` : "";
+        
+        let contentHtml = "";
+        if (isDeleted) {
+            contentHtml = `<div class="msg-content msg-deleted-content"><i class="fa-solid fa-ban" style="margin-right: 5px; opacity: 0.7;"></i><em>This message was deleted</em></div>`;
+        } else if (rawContent) {
+            contentHtml = `<div class="msg-content">${escapeHTML(rawContent)}</div>`;
+        }
+
+        let deleteBtnHtml = "";
+        if (isOutgoing && !isDeleted && msg.messageId) {
+            deleteBtnHtml = `
+                <button class="delete-msg-btn" title="Delete message" onclick="deleteMessage('${msg.messageId}')">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            `;
+        }
         
         wrapper.innerHTML = `
             ${!isOutgoing ? `<div class="avatar small" style="background: ${getGradientForName(msg.sender)}">${avatarLetter}</div>` : ""}
-            <div class="message-bubble">
+            <div class="message-bubble ${isDeleted ? 'msg-deleted-bubble' : ''}">
+                ${deleteBtnHtml}
                 ${mediaHtml}
                 ${contentHtml}
                 <div class="msg-meta">
@@ -834,4 +859,80 @@ function handleAiSummarize() {
             console.error("AI Summary error:", err);
             aiModalBody.innerHTML = `<p style="color: var(--accent-red);">Failed to connect to AI service.</p>`;
         });
+}
+
+// --- Message Deletion Client Logic ---
+function deleteMessage(messageId) {
+    if (!messageId) return;
+    if (!confirm("Delete this message for everyone?")) return;
+
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert("Cannot delete message: chat connection is not open.");
+        return;
+    }
+
+    const payload = {
+        type: "DELETE_MSG",
+        sender: currentNickname,
+        messageId: messageId
+    };
+
+    if (activeChat) {
+        if (activeChat.type === "room") {
+            payload.roomCode = activeChat.target;
+        } else {
+            payload.recipient = activeChat.target;
+        }
+    }
+
+    ws.send(JSON.stringify(payload));
+}
+
+function handleMessageDeletedEvent(msg) {
+    if (!msg || !msg.messageId) return;
+
+    // 1. Update in-memory chat histories
+    Object.keys(chatHistories).forEach(key => {
+        const history = chatHistories[key];
+        if (Array.isArray(history)) {
+            history.forEach(m => {
+                if (m.messageId === msg.messageId) {
+                    m.deleted = true;
+                    m.content = "This message was deleted";
+                    m.mediaData = null;
+                    m.mediaName = null;
+                    m.mediaType = null;
+                }
+            });
+        }
+    });
+
+    // 2. Update DOM element if present
+    const el = document.querySelector(`[data-message-id="${msg.messageId}"]`);
+    if (el) {
+        const bubble = el.querySelector(".message-bubble");
+        if (bubble) {
+            bubble.classList.add("msg-deleted-bubble");
+
+            // Remove delete button if exists
+            const delBtn = bubble.querySelector(".delete-msg-btn");
+            if (delBtn) delBtn.remove();
+
+            // Remove media preview
+            const mediaImg = bubble.querySelector(".msg-media-img");
+            if (mediaImg) mediaImg.remove();
+            const mediaFile = bubble.querySelector(".msg-media-file");
+            if (mediaFile) mediaFile.remove();
+
+            // Replace text content
+            let contentEl = bubble.querySelector(".msg-content");
+            if (!contentEl) {
+                contentEl = document.createElement("div");
+                contentEl.className = "msg-content";
+                bubble.insertBefore(contentEl, bubble.querySelector(".msg-meta"));
+            }
+            contentEl.className = "msg-content msg-deleted-content";
+            contentEl.innerHTML = `<i class="fa-solid fa-ban" style="margin-right: 5px; opacity: 0.7;"></i><em>This message was deleted</em>`;
+        }
+    }
 }

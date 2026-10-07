@@ -1781,5 +1781,46 @@ body, html {
     }
 }
 
+/* Delete Message Action Button & Deleted State */
+.message-bubble {
+    position: relative;
+}
+
+.delete-msg-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.35);
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.message-wrapper:hover .delete-msg-btn {
+    opacity: 1;
+}
+
+.delete-msg-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.msg-deleted-bubble {
+    opacity: 0.75;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.msg-deleted-content {
+    font-style: italic;
+    color: var(--text-muted) !important;
+    font-size: 0.85rem;
+}
+
 
 

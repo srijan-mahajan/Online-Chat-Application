@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 public class ChatMessage {
+    private String messageId;
+    private Boolean deleted;
     private String type;
     private String sender;
     private String recipient;
@@ -140,5 +142,21 @@ public class ChatMessage {
 
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }
