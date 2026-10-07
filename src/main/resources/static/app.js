@@ -862,10 +862,51 @@ function handleAiSummarize() {
 }
 
 // --- Message Deletion Client Logic ---
+let pendingDeleteMessageId = null;
+
+// Modal Elements
+const deleteModal = document.getElementById("delete-modal");
+const closeDeleteModalBtn = document.getElementById("close-delete-modal-btn");
+const cancelDeleteModalBtn = document.getElementById("cancel-delete-modal-btn");
+const deleteForEveryoneBtn = document.getElementById("delete-for-everyone-btn");
+const deleteForMeBtn = document.getElementById("delete-for-me-btn");
+
+if (closeDeleteModalBtn) closeDeleteModalBtn.addEventListener("click", closeDeleteModal);
+if (cancelDeleteModalBtn) cancelDeleteModalBtn.addEventListener("click", closeDeleteModal);
+
+if (deleteForEveryoneBtn) {
+    deleteForEveryoneBtn.addEventListener("click", () => {
+        if (!pendingDeleteMessageId) return;
+        executeDeleteForEveryone(pendingDeleteMessageId);
+        closeDeleteModal();
+    });
+}
+
+if (deleteForMeBtn) {
+    deleteForMeBtn.addEventListener("click", () => {
+        if (!pendingDeleteMessageId) return;
+        executeDeleteForMe(pendingDeleteMessageId);
+        closeDeleteModal();
+    });
+}
+
+function openDeleteModal(messageId) {
+    pendingDeleteMessageId = messageId;
+    if (deleteModal) deleteModal.classList.remove("hidden");
+}
+
+function closeDeleteModal() {
+    pendingDeleteMessageId = null;
+    if (deleteModal) deleteModal.classList.add("hidden");
+}
+
 function deleteMessage(messageId) {
     if (!messageId) return;
-    if (!confirm("Delete this message for everyone?")) return;
+    openDeleteModal(messageId);
+}
 
+// 1. Delete for Everyone (Broadcasted to WebSocket & DB)
+function executeDeleteForEveryone(messageId) {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
         alert("Cannot delete message: chat connection is not open.");
         return;
@@ -886,6 +927,29 @@ function deleteMessage(messageId) {
     }
 
     ws.send(JSON.stringify(payload));
+}
+
+// 2. Delete for Me (Local client only - vanishes from sender's view immediately)
+function executeDeleteForMe(messageId) {
+    // Remove from in-memory histories
+    Object.keys(chatHistories).forEach(key => {
+        const history = chatHistories[key];
+        if (Array.isArray(history)) {
+            const idx = history.findIndex(m => m.messageId === messageId);
+            if (idx !== -1) {
+                history.splice(idx, 1);
+            }
+        }
+    });
+
+    // Remove DOM element from UI with clean animation
+    const el = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (el) {
+        el.style.transition = "all 0.25s ease";
+        el.style.opacity = "0";
+        el.style.transform = "scale(0.9)";
+        setTimeout(() => el.remove(), 250);
+    }
 }
 
 function handleMessageDeletedEvent(msg) {
